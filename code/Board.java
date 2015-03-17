@@ -204,5 +204,15 @@ public class Board implements Cloneable{
 
 		return false;
 	}
+	
+	public int getBlacksCaptured()
+	{
+		return black_captured;
+	}
+	
+	public int getWhiteCaptured()
+	{
+		return white_captured;
+	}
 
 }
