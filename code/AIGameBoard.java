@@ -37,18 +37,11 @@ public class AIGameBoard{
 		
 		int score = 0;
 		
-		
-		// black player is the opponent
-		// opponent wants to minimize the AI's score
-		if (player == _board.BLACK && (newScore > originalScore)){
-			score = -10;
-		}
-		// white player is the AI
-		// need to maximize score
-		else if((player == _board.WHITE) && (newScore > originalScore)){
-			score = 10;
-		}
-
+		// black player is the opponent, and wants to minimize AI'score
+		// white player is the AI, and wants to maximize score
+		int difference = Math.abs(newScore - originalScore);
+		if (newScore > originalScore)
+			score = (player == Board.BLACK) ? -difference : difference;
 		return score;
 	}
 

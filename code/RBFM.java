@@ -8,9 +8,12 @@ import java.util.*;
 public class RBFM {
 	
 	private Node _root;
-	public RBFM(Node root)
+	//REMOVE!!!
+	public int value;
+	public RBFM(Node root) throws CloneNotSupportedException
 	{
 		_root = root;
+		value = 10;
 		root_decision();
 	}
 	
@@ -18,7 +21,7 @@ public class RBFM {
 		return _root;
 	}
 	
-	public void extend_down(Node n){
+	public void extend_down(Node n) throws CloneNotSupportedException{
 		n.expanded();
 		
 		if (n.isLeaf()){
@@ -31,7 +34,7 @@ public class RBFM {
 		}
 	}
 	
-	public void extend_up(Node n){
+	public void extend_up(Node n) throws CloneNotSupportedException{
 		n.expanded();
 		
 		if (n.isLeaf()){
@@ -44,7 +47,7 @@ public class RBFM {
 		}
 	}
 	
-	public void root_decision()
+	public void root_decision() throws CloneNotSupportedException
 	{
 		while (stopping_criterion() != false)
 		{
@@ -59,7 +62,7 @@ public class RBFM {
 		}
 	}
 
-	public void expand_leaf(Node parent)
+	public void expand_leaf(Node parent) throws CloneNotSupportedException
 	{
 		parent.expanded();
 		
@@ -67,7 +70,9 @@ public class RBFM {
 		AIPlayer.minimax(1, parent.getPlayer(), parent.getBoard(), parent);
 		
 		// set negamax score
-		parent.setScore(parent.getNegaMaxScore());
+		int[] info = parent.getNegaMaxScore();
+		parent.setScore(info[0]);
+		parent.setPosition(info[1]);
 		
 		// send score up to the root
 		backup(parent);
@@ -81,7 +86,10 @@ public class RBFM {
 	{
 		while (v != null)
 		{
-			v.setScore(v.getNegaMaxScore());
+			// set negamax score
+			int[] info = v.getNegaMaxScore();
+			v.setScore(info[0]);
+			v.setPosition(info[1]);
 			v.calculateDistribution();
 			v = v.getParent();
 		}
@@ -90,6 +98,10 @@ public class RBFM {
 	// not done, figure out stopping criteria
 	public boolean stopping_criterion()
 	{
+		if (value!=0){
+			value--;
+			return true;
+		}
 		return false;
 	}
 
