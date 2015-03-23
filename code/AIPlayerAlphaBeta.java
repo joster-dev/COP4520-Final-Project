@@ -6,13 +6,13 @@ import java.util.Random;
  * @author Cindy
  *
  */
-public class AIPlayer{
+public class AIPlayerAlphaBeta{
 	// this variables determines how many locations on the board we are willing to expand on
-	
+	private int INF = Integer.MAX_VALUE;
 	private Node _root;
 	private int _depth;
-	public AIPlayer(){
-		_depth = 5;
+	public AIPlayerAlphaBeta(){
+		_depth = 2;
 	}
 	
 	/**
@@ -28,7 +28,7 @@ public class AIPlayer{
 			_root = new Node(null);
 			
 			//  run minimax algorithm
-			minimax(_depth, Board.WHITE, board, _root);
+			minimax(_depth, Board.WHITE, board, _root, -INF, +INF);
 		}
 		
 		// run rbfm algorithm using minimax tree
@@ -64,7 +64,7 @@ public class AIPlayer{
 	 * @return best score from a particular position for the AI
 	 * @throws CloneNotSupportedException 
 	 */
-	public static int minimax(int depth, char player, Board board, Node root) throws CloneNotSupportedException
+	public static int minimax(int depth, char player, Board board, Node root, int alpha, int beta) throws CloneNotSupportedException
 	{	
 		// Get all possible moves
 		ArrayList<Integer> nextMoves = generateMoves(board.board);
@@ -96,14 +96,13 @@ public class AIPlayer{
 						child.setPosition(move);
 						child.setScore(score);
 						
-						currentScore = minimax(depth-1, Board.BLACK, (Board)gameBoard.getBoard().clone(), child);
+						currentScore = minimax(depth-1, Board.BLACK, (Board)gameBoard.getBoard().clone(), child, alpha, beta);
 						child.setBoard((Board)board.clone());
 						child.setPlayer(player);
 						children.add(child);
 						
-						if (currentScore > bestScore)
-						{
-							bestScore = currentScore;
+						if ( currentScore > alpha){
+							alpha = currentScore;
 							bestPosition = move;
 						}
 						
@@ -123,7 +122,7 @@ public class AIPlayer{
 					{
 						// Create child for root
 						Node child = new Node(root);
-						currentScore = minimax(depth-1, Board.WHITE, gameBoard.getBoard(), child);
+						currentScore = minimax(depth-1, Board.WHITE, gameBoard.getBoard(), child, alpha, beta);
 						child.setPosition(move);
 						child.setScore(score);
 
@@ -131,9 +130,9 @@ public class AIPlayer{
 						child.setPlayer(player);
 						children.add(child);
 						
-						if (currentScore < bestScore)
+						if (currentScore < beta)
 						{
-							bestScore = currentScore;
+							beta = currentScore;
 							bestPosition = move;
 						}
 					}
@@ -146,6 +145,8 @@ public class AIPlayer{
 						children.add(child);
 					}
 					
+					if (alpha >= beta) break;
+					
 				}
 
 			}
@@ -156,6 +157,8 @@ public class AIPlayer{
 			root.setBoard((Board)board.clone());
 			root.setPlayer(player);
 		}
+		
+		bestScore =  (player == Board.BLACK) ? beta : alpha;
 			
 		if (bestPosition != -1)
 		{

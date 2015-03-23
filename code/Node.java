@@ -12,13 +12,13 @@ public class Node
 	private Node 			_parent;
 	private int 			_negamaxScore;
 	private int 			_minimaxScore; 
+	private int 			_position; // best position
 	private double 			_distribution;
 	private int 			_num_expanded;
 	
 	// these variables will only be initialized for leaf nodes
 	private Board 			_board;
 	private char 			_player;
-	private int 			_position;
 	
 	// used for distribution method
 	private boolean NORMAL = 		true;
@@ -31,11 +31,13 @@ public class Node
 	 * @param parent - of current node
 	 */
 	public Node(Node parent){
+		_children = new ArrayList<Node>();
 		_distribution = 0;
 		_minimaxScore = 0;
 		_parent = parent;
 		_num_expanded = 0;
 		_negamaxScore = 0;
+		_position = -1;
 	}
 	
 	/**
@@ -45,6 +47,7 @@ public class Node
 	 * @param position - position that player has moved to
 	 */
 	public Node(Node parent, int score, int position){
+		_children = new ArrayList<Node>();
 		_negamaxScore = 0;
 		_minimaxScore = score;
 		_position = position;
@@ -53,15 +56,27 @@ public class Node
 	}
 	
 	/**
-	 * Negamax score of a node is the maximum of the negated minimax score of its children
+	 * Negamax score of a node is the maximum of the negated minimax score of its children and the position
 	 * @return negamax score
 	 */
-	public int getNegaMaxScore(){
+	public int[] getNegaMaxScore(){
 		int max = Integer.MIN_VALUE;
+		int bestPosition=-1;
 		for (Node child : _children){
 			max = Math.max(max, -child.getScore());
+			if ((-child.getScore()) > max){
+				max = -child.getScore();
+				bestPosition = child.getPosition();
+			}
 		}
-		return max;
+		
+		// All children have the same score! Choose a random child's score
+		if (bestPosition == -1){
+			Node child = choose_random_child();
+			max = child.getScore();
+			bestPosition = child.getPosition();
+		}
+		return new int[]{max,bestPosition};
 	}
 	
 	/**
@@ -107,7 +122,8 @@ public class Node
 	 */
 	public void calculateDistribution()
 	{
-		
+		// return a random number for now!
+		_distribution = Math.random();
 	}
 	
 	public void setParent(char p){
@@ -119,7 +135,7 @@ public class Node
 	}
 	
 	public void setChildren(ArrayList<Node> children){
-		this._children = children;
+		_children = children;
 	}
 	
 	public void setScore(int score){
@@ -164,5 +180,18 @@ public class Node
 	public Node getParent(){
 		return _parent;
 	}
+	
+	public String toString()
+	{
+		return Integer.toString(_minimaxScore);
+	}
+	
+//	public Object clone() throws CloneNotSupportedException{
+//		Node cloned = (Node)super.clone();
+//		clo1ned.setBoard(cloned.getBoard());
+//		cloned.setChildren(cloned.get)
+//		return cloned;
+//	}
+
 	
 }

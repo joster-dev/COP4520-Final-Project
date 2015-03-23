@@ -8,15 +8,34 @@ public class testBoard{
 		Scanner s = new Scanner(System.in);
 
 		char turn = '2';
-
+		int pos = 0;
+		AIPlayer aiPlayer = new AIPlayer();
 		while(true){
+
 			b.print_board();
 			System.out.println();
-			int pos = s.nextInt();
-
-			while(!b.is_legal(turn, pos)){
-				System.out.println("Illegal Move");
+			
+			if (turn == '2'){
+				
 				pos = s.nextInt();
+
+				while(!b.is_legal(turn, pos)){
+					System.out.println("Illegal Move");
+					pos = s.nextInt();
+				}
+			}
+			else{
+				// AI's turn
+				try {
+					pos = aiPlayer.move(b);
+					while(!b.is_legal(turn, pos)){
+						System.out.println("Illegal Move");
+						pos = aiPlayer.move(b);
+					}
+				} catch (CloneNotSupportedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			b.add_stone(turn, pos);
 			turn = b.opposite(turn);

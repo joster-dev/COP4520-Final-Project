@@ -36,7 +36,7 @@ public class Board implements Cloneable{
 		suicide point, or that there isnt already a piece there
 	*/
 	public boolean is_legal(char color, int pos){
-		if(board[pos] != EMPTY)
+		if((pos > 0) && board[pos] != EMPTY)
 			return false;
 		if(pos == ko_point)
 			return false;
