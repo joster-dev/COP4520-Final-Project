@@ -22,13 +22,13 @@ public class AIPlayer{
 	 */
 	public int move(Board board) throws CloneNotSupportedException
 	{
-		if (_root == null)
-		{
-			_root = new Node(null);
-			
-			//  run minimax algorithm
-			minimax(_depth, Board.WHITE, board, _root);
-		}
+		_root = new Node(null);
+		
+		//  run minimax algorithm
+		minimax(_depth, Board.WHITE, board, _root);
+		
+		// compute alpha beta scores
+		minimax(_depth, Board.WHITE, board, _root, -INF, +INF);
 		
 		// run rbfm algorithm using minimax tree
 		RBFM randomBFM = new RBFM(_root);
