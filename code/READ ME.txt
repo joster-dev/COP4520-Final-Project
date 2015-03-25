@@ -1,0 +1,24 @@
+Instructions (for a machine running Windows) 
+
+***	NOTE: In order to execute java commands in windows command line,
+	you must set Environment Variable. Please refer to "Setting Path on Windows.txt"
+	before continuing.
+
+1. Open command prompt
+2. Navigate to folder containing the java file using
+
+	 cd "Path/of/file"
+
+3. Compile files by typing:
+	
+	compile.cmd
+
+4. Execute file by typing:
+
+	java testBoard
+
+5. Program will begin executing. 
+
+
+
+
