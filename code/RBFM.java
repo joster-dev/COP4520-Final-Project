@@ -14,7 +14,6 @@ public class RBFM {
 	{
 		_root = root;
 		value = 10;
-		root_decision();
 	}
 	
 	public Node getRoot(){
@@ -90,7 +89,6 @@ public class RBFM {
 			int[] info = v.getNegaMaxScore();
 			v.setScore(info[0]);
 			v.setPosition(info[1]);
-			v.calculateDistribution();
 			v = v.getParent();
 		}
 	}

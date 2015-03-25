@@ -32,6 +32,7 @@ public class testBoard{
 						System.out.println("Illegal Move");
 						pos = aiPlayer.move(b);
 					}
+					System.out.println(pos);
 				} catch (CloneNotSupportedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
