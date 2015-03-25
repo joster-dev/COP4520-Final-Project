@@ -12,6 +12,7 @@ public class Node
 	private Node 			_parent;
 	private int 			_negamaxScore;
 	private int 			_minimaxScore; 
+	private int 			_alphaBetaScore;
 	private int 			_position; // best position
 	private double 			_distribution;
 	private int 			_num_expanded;
@@ -34,6 +35,7 @@ public class Node
 		_children = new ArrayList<Node>();
 		_distribution = 0;
 		_minimaxScore = 0;
+		_alphaBetaScore = 0;
 		_parent = parent;
 		_num_expanded = 0;
 		_negamaxScore = 0;
@@ -51,8 +53,10 @@ public class Node
 		_negamaxScore = 0;
 		_minimaxScore = score;
 		_position = position;
+		_alphaBetaScore = 0;
 		_parent = parent;
 		_num_expanded = 0;
+		_distribution = 0;
 	}
 	
 	/**
@@ -116,16 +120,6 @@ public class Node
 		return best;
 	}
 	
-	// not done :(
-	/**
-	 * Distribution method used to estimate node distribution
-	 */
-	public void calculateDistribution()
-	{
-		// return a random number for now!
-		_distribution = Math.random();
-	}
-	
 	public void setParent(char p){
 		_player = p;
 	}
@@ -134,8 +128,21 @@ public class Node
 		return _player;
 	}
 	
+	
+	public void setAlphaBetaScore(int score){
+		_alphaBetaScore = score;
+	}
+	
+	public int getAlphaBetaScore(){
+		return _alphaBetaScore;
+	}
+	
 	public void setChildren(ArrayList<Node> children){
 		_children = children;
+	}
+	
+	public ArrayList<Node> getChildren(){
+		return _children;
 	}
 	
 	public void setScore(int score){
@@ -174,24 +181,14 @@ public class Node
 	}
 	
 	public double getDistribution(){
-		return _distribution;
+		return _alphaBetaScore - _minimaxScore;
 	}
 	
 	public Node getParent(){
 		return _parent;
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return Integer.toString(_minimaxScore);
-	}
-	
-//	public Object clone() throws CloneNotSupportedException{
-//		Node cloned = (Node)super.clone();
-//		clo1ned.setBoard(cloned.getBoard());
-//		cloned.setChildren(cloned.get)
-//		return cloned;
-//	}
-
-	
+	}	
 }

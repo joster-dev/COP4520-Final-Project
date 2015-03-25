@@ -7,10 +7,9 @@ import java.util.Random;
  *
  */
 public class AIPlayer{
-	// this variables determines how many locations on the board we are willing to expand on
-	
 	private Node _root;
 	private int _depth;
+	private int INF = Integer.MAX_VALUE;
 	public AIPlayer(){
 		_depth = 5;
 	}
@@ -33,6 +32,7 @@ public class AIPlayer{
 		
 		// run rbfm algorithm using minimax tree
 		RBFM randomBFM = new RBFM(_root);
+		randomBFM.root_decision();
 		
 		// return best position
 		return randomBFM.getRoot().getPosition();
@@ -76,7 +76,6 @@ public class AIPlayer{
 		int bestScore = (player == Board.BLACK) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
 		int currentScore;
 		int bestPosition = -1;
-		
 		if (depth != 0 && !nextMoves.isEmpty())
 		{
 			for (int move : nextMoves)
@@ -180,5 +179,76 @@ public class AIPlayer{
 		return bestScore;
 		
 	}	
+	
+	public static int minimax(int depth, char player, Board board, Node root, int alpha, int beta) throws CloneNotSupportedException
+	{			
+		// Create array to hold all new children of current root
+		ArrayList<Node> children = root.getChildren();
+		
+		// AI must maximize score, whereas, opponent must minimize score
+		int bestScore = (player == Board.BLACK) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+		int currentScore;
+		int bestPosition = -1;
+		
+		if (depth != 0 && !children.isEmpty())
+		{
+			for (Node c : children)
+			{
+				int move = c.getPosition();
+				
+				// create board for this sequence of moves
+				AIGameBoard gameBoard = new AIGameBoard((Board)board.clone());
+				
+				// try this move for the current player
+				int score = gameBoard.turn(player, move);
+				
+				if (player == Board.WHITE){
+					// end state not reached, generate new states
+					if (score==0){
+						
+						currentScore = minimax(depth-1, Board.BLACK, (Board)gameBoard.getBoard().clone(), c, alpha, beta);
+						
+						if ( currentScore > alpha){
+							alpha = currentScore;
+							bestPosition = move;
+						}
+						
+					}
+					
+				}
+				else{
+					// end state not reached, generate new states
+					if (score==0){
+						// Create child for root
+						currentScore = minimax(depth-1, Board.WHITE, gameBoard.getBoard(), c, alpha, beta);
+						
+						if (currentScore < beta){
+							beta = currentScore;
+							bestPosition = move;
+						}
+					}
+					
+					if (alpha >= beta) break;
+					
+				}
+
+			}
+		}
+		
+		bestScore =  (player == Board.BLACK) ? beta : alpha;
+			
+		if (bestPosition != -1)
+		{
+			root.setAlphaBetaScore(bestScore);
+		}
+		else if (children.size() != 0 && bestPosition == -1)
+		{
+			root.setAlphaBetaScore(root.getScore());
+		}
+
+		return bestScore;
+		
+	}	
+
 
 }
