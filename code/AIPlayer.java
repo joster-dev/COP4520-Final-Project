@@ -38,20 +38,14 @@ public class AIPlayer{
 		return randomBFM.getRoot().getPosition();
 	}
 	
-	// ! 10 needs to be changed!
 	private static ArrayList<Integer> generateMoves(char[] board)
 	{
 		// get all possible moves for this particular board configuration
 		ArrayList<Integer> moves = new ArrayList<Integer>();
-		Random r = new Random();
-		for (int i=0; i<10; i++){
-			// Pick a random spot on the array
-			int index = r.nextInt(board.length);
-			while (board[index]!=Board.EMPTY)
-			{
-				index = r.nextInt(board.length);	
-			}
-			moves.add(index);
+		
+		for (int i=0;i<board.length;i++){
+			if (board[i] == Board.EMPTY)
+				moves.add(i);
 		}
 		return moves;
 	};
@@ -64,7 +58,7 @@ public class AIPlayer{
 	 * @return best score from a particular position for the AI
 	 * @throws CloneNotSupportedException 
 	 */
-	public static int minimax(int depth, char player, Board board, Node root) throws CloneNotSupportedException
+	public static int[] minimax(int depth, char player, Board board, Node root) throws CloneNotSupportedException
 	{	
 		// Get all possible moves
 		ArrayList<Integer> nextMoves = generateMoves(board.board);
@@ -93,9 +87,10 @@ public class AIPlayer{
 						// Create child for root
 						Node child = new Node(root);
 						child.setPosition(move);
-						child.setScore(score);
 						
-						currentScore = minimax(depth-1, Board.BLACK, (Board)gameBoard.getBoard().clone(), child);
+						int[] arr = minimax(depth-1, Board.BLACK, (Board)gameBoard.getBoard().clone(), child);
+						currentScore = arr[0];
+						child.setScore(currentScore);
 						child.setBoard((Board)board.clone());
 						child.setPlayer(player);
 						children.add(child);
@@ -103,11 +98,18 @@ public class AIPlayer{
 						if (currentScore > bestScore)
 						{
 							bestScore = currentScore;
-							bestPosition = move;
+							bestPosition = arr[1];
 						}
 						
 					}
 					else{	
+						
+						if (score > bestScore)
+						{
+							bestScore = score;
+							bestPosition = move;
+						}
+						
 						Node child = new Node(root, score, move);
 						child.setBoard((Board)board.clone());
 						child.setPlayer(player);
@@ -122,9 +124,10 @@ public class AIPlayer{
 					{
 						// Create child for root
 						Node child = new Node(root);
-						currentScore = minimax(depth-1, Board.WHITE, gameBoard.getBoard(), child);
+						int[] arr =  minimax(depth-1, Board.WHITE, gameBoard.getBoard(), child);
+						currentScore = arr[0];
 						child.setPosition(move);
-						child.setScore(score);
+						child.setScore(currentScore);
 
 						child.setBoard((Board)board.clone());
 						child.setPlayer(player);
@@ -133,10 +136,15 @@ public class AIPlayer{
 						if (currentScore < bestScore)
 						{
 							bestScore = currentScore;
-							bestPosition = move;
+							bestPosition = arr[1];
 						}
 					}
 					else{
+						if (score < bestScore)
+						{
+							bestScore = score;
+							bestPosition = move;
+						}
 						// end state reached
 						// add child to list
 						Node child = new Node(root, score, move);
@@ -175,8 +183,18 @@ public class AIPlayer{
 		else if (children.size() != 0){
 			root.setChildren(children);
 		}
+		else if (bestScore == Integer.MIN_VALUE && player == Board.WHITE)
+		{
+			bestScore = Math.max(root.getScore(), bestScore);
+			bestPosition = root.getPosition();
+		}
+		else if(bestScore == Integer.MAX_VALUE && player == Board.BLACK)
+		{
+			bestScore = Math.min(root.getScore(), bestScore);
+			bestPosition = root.getPosition();
+		}
 
-		return bestScore;
+		return new int[]{bestScore,bestPosition};
 		
 	}	
 	
@@ -214,6 +232,12 @@ public class AIPlayer{
 						}
 						
 					}
+					else{
+						if ( score > alpha){
+							alpha = score;
+							bestPosition = move;
+						}
+					}
 					
 				}
 				else{
@@ -226,6 +250,14 @@ public class AIPlayer{
 							beta = currentScore;
 							bestPosition = move;
 						}
+					}
+					else{
+						
+						if (score < beta){
+							beta = score;
+							bestPosition = move;
+						}
+						
 					}
 					
 					if (alpha >= beta) break;
