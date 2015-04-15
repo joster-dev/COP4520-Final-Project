@@ -11,7 +11,7 @@ public class AIPlayer{
 	private int _depth;
 	private int INF = Integer.MAX_VALUE;
 	public AIPlayer(){
-		_depth = 5;
+		_depth = 6;
 	}
 	
 	/**
@@ -29,7 +29,7 @@ public class AIPlayer{
 		
 		int a = minimax(_depth,Board.WHITE,_root,-INF,+INF);
 		
-		System.out.println(pos[0] + "vs " + a);
+		System.out.println(pos[0] + " vs " + a);
 		
 		RBFM randomBFM = new RBFM(_root);
 		randomBFM.root_decision();

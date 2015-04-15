@@ -20,7 +20,7 @@ import game.player.SimpleComputerPlayer;
 
 //proof of concept Go Game Runner
 public class AppRunner {
-	public static final int BOARD_SIZE = 9;
+	public static final int BOARD_SIZE = 5;
 	
 	public static void main(String[] args) throws NumberFormatException, MoveException, IOException{
 		Queue<Player> players = createPlayers();
@@ -46,7 +46,8 @@ public class AppRunner {
 	private static Queue<Player> createPlayers() {
 		Queue<Player> players = new ArrayBlockingQueue<>(2);
 		players.add(new HumanPlayer(PlayerColor.BLACK));
-		players.add(new MCTSComputerPlayer(PlayerColor.WHITE, 100));
+		// players.add(new SimpleComputerPlayer(PlayerColor.BLACK));
+		players.add(new MCTSComputerPlayer(PlayerColor.WHITE, 1000));
 		
 		return players;
 	}
