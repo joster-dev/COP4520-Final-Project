@@ -25,9 +25,11 @@ public class AIPlayer{
 		_root = new Node(null);
 		
 		//  run minimax algorithm
-		int[] arr = minimax(_depth, Board.WHITE, board, _root);
+		int[] pos = minimax(_depth, Board.WHITE, board, _root);
 		
-		int pos =  minimax(_depth,Board.WHITE,_root,-INF,+INF);
+		int a = minimax(_depth,Board.WHITE,_root,-INF,+INF);
+		
+		System.out.println(pos[0] + "vs " + a);
 		
 		RBFM randomBFM = new RBFM(_root);
 		randomBFM.root_decision();

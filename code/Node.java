@@ -21,11 +21,6 @@ public class Node
 	private Board 			_board;
 	private char 			_player;
 	
-	// used for distribution method
-	private boolean NORMAL = 		true;
-	private boolean EXPONENTIAL = 	false;
-	private boolean CHISQUARE = 	false;
-	
 	/**
 	 * This constructor is only called when the end state of minimax node is not reached, and must branch off.
 	 * Thus, certain variables will be initialized later using set methods
