@@ -26,7 +26,7 @@ public class Board implements Cloneable{
 		player_turn = color;
 		black_captured = 0;
 		white_captured = 0;
-
+		ko_point = -1;
 		for(int i=0;i<size*size;++i)
 			board[i] = EMPTY;
 	}
@@ -36,7 +36,8 @@ public class Board implements Cloneable{
 		suicide point, or that there isnt already a piece there
 	*/
 	public boolean is_legal(char color, int pos){
-		if((pos > 0) && board[pos] != EMPTY)
+		if (!inBounds(pos)) return false;
+		if(board[pos] != EMPTY) 
 			return false;
 		if(pos == ko_point)
 			return false;
@@ -116,7 +117,6 @@ public class Board implements Cloneable{
 			if(board[n] == opposite(color) && board[n] != EMPTY){
 
 				Chain enemy = get_Chain(n);
-
 				if(enemy.in_Atari()){
 					for(int e : enemy.stones){
 						board[e] = EMPTY;
@@ -158,17 +158,30 @@ public class Board implements Cloneable{
 
 		}
 	}
+	
+	boolean inBounds(int pos){
+		if (pos >= 0 && pos < size*size) return true;
+		return false;
+	}
 	List<Integer> get_Neighbors(int pos){
 		List<Integer> nghbs = new ArrayList<Integer>();
 
-		if(pos != 0 && pos%size != 0)
-			nghbs.add(pos-1) ;
-		if(pos != size*size-1 && pos%(size-1) != 0)
-			nghbs.add(pos+1);
-		if(pos >= size)
-			nghbs.add(pos - size);
-		if(pos <= size*size - size-1)
-			nghbs.add(pos + size);
+		if(pos != 0 && pos%size != 0){
+			if (inBounds(pos-1))
+				nghbs.add(pos-1) ;
+		}
+		if(pos != size*size-1 && pos%(size-1) != 0){
+			if (inBounds(pos+1))
+				nghbs.add(pos+1);
+		}
+		if(pos >= size){
+			if(inBounds(pos-size))
+				nghbs.add(pos - size);
+		}
+		if(pos <= size*size - size-1){
+			if (inBounds(pos + size))
+				nghbs.add(pos + size);
+		}
 
 		return nghbs;
 	}
@@ -177,7 +190,7 @@ public class Board implements Cloneable{
 		This function can be sped up by keeping of track of groups of stones
 		There would be no need for a floodfill search and for cloning the board
 	*/
-	Set<Integer> get_Liberties(int pos){
+	Set<Integer> get_Liberties(int pos, int[] visited){
 		Set<Integer> liberties = new HashSet<Integer>();
 
 		char color = board[pos];
@@ -186,8 +199,11 @@ public class Board implements Cloneable{
 
 		List<Integer> nghbs = get_Neighbors(pos);
 		for(int n : nghbs){
-			if(board[n] == color)
-				liberties.addAll( get_Liberties(n) );
+			if (inBounds(n) == false) continue;
+			if(board[n] == color && visited[n] != 1){
+				visited[n] = 1;
+				liberties.addAll( get_Liberties(n,visited) );
+			}
 			else if( board[n] == EMPTY)
 				liberties.add(n);
 		}
@@ -199,7 +215,7 @@ public class Board implements Cloneable{
 	boolean in_Atari(int pos){
 		try{
 			Board copy = (Board) this.clone();
-			return copy.get_Liberties(pos).size()  == 1;
+			return copy.get_Liberties(pos, new int[size*size]).size()  == 1;
 		} catch (CloneNotSupportedException c) {}
 
 		return false;
