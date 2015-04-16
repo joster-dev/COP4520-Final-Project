@@ -1,3 +1,5 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.*;
 /**
  * RBFM algorithm: a game-search algorithm that randomizes Best-First Minimax Search
@@ -7,17 +9,48 @@ import java.util.*;
 
 public class RBFM {
 	
+	ArrayList<Thread> threads = new ArrayList<>();
+
 	private Node _root;
 	//REMOVE!!!
+	public int totalThreads;
 	public int value;
-	public RBFM(Node root) throws CloneNotSupportedException
+	public BufferedWriter _outputFile;
+	public RBFM(Node root, BufferedWriter outputFile) throws CloneNotSupportedException
 	{
 		_root = root;
 		value = 10;
+		totalThreads = 2;
+		_outputFile = outputFile;
+	}
+	
+	public BufferedWriter getOutputFile(){
+		return _outputFile;
 	}
 	
 	public Node getRoot(){
 		return _root;
+	}
+	
+	public int countExpansions(Node root){
+		int total = root.getNumExpanded();
+		if (root!= null){
+			
+			for (Node n : root.getChildren()){
+				total+= countExpansions(n);
+			}
+		}
+		return total;
+	}
+	
+	public void resetNodeExpansions(Node root){
+		if (root != null) {
+			root.resetNodeExpansions();
+			for (int i=0;i<root.getChildren().size();i++)
+			{
+				resetNodeExpansions(root.getChildren().get(i));
+			}
+		}
 	}
 	
 	public void extend_down(Node n) throws CloneNotSupportedException{
@@ -46,18 +79,71 @@ public class RBFM {
 		}
 	}
 	
-	public void root_decision() throws CloneNotSupportedException
+	public class WorkerThread extends Thread
 	{
-		while (stopping_criterion() != false)
+		private Thread t;
+		private int id;
+		private int current_value;
+		
+		public WorkerThread(int id)
 		{
+			this.id = id;
+		}
+		
+		public void run() {
 			Node v = _root.choose_random_child();
-			
+
+			v.lockNode();
+
 			if (v == _root.best_child()){
-				extend_up(v);
+				try {
+					extend_up(v);
+					}
+				catch (CloneNotSupportedException e){
+				}
 			}
 			else{
-				extend_down(v);
+				try {
+					extend_down(v);
+					}
+				catch (CloneNotSupportedException e){
+				}
 			}
+			v.unlockNode();
+		}
+		
+		public void start()
+		{
+			if (t == null)
+			{
+				t = new Thread(this, Integer.toString(id));
+				t.start();
+			}
+		}
+	}
+ 
+	
+	public void root_decision() throws CloneNotSupportedException, InterruptedException, IOException
+	{ 
+		while (stopping_criterion() != false)
+		{
+			resetNodeExpansions(_root);
+			WorkerThread[] workers = new WorkerThread[totalThreads];
+			for (int i=0; i<totalThreads;i++){
+				workers[i] = new WorkerThread(i);
+				workers[i].start();
+			}
+			
+			for (int i=0; i<totalThreads;i++){
+				workers[i].t.join();
+			}
+		}
+		
+		if (_outputFile != null){
+			int totalExpansions = countExpansions(_root);
+			String output = "Number of node expansions " + totalExpansions;
+			_outputFile.write(output);
+			_outputFile.newLine();
 		}
 	}
 

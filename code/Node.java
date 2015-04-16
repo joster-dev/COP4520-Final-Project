@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Node class used to store information about each minimax position
@@ -20,6 +22,17 @@ public class Node
 	// these variables will only be initialized for leaf nodes
 	private Board 			_board;
 	private char 			_player;
+
+
+	private Lock _lock; 
+	
+	public void lockNode(){
+		_lock.lock();
+	}
+
+	public void unlockNode(){
+		_lock.unlock();
+	}
 	
 	/**
 	 * This constructor is only called when the end state of minimax node is not reached, and must branch off.
@@ -35,6 +48,7 @@ public class Node
 		_num_expanded = 0;
 		_negamaxScore = 0;
 		_position = -1;
+		_lock = new ReentrantLock();
 	}
 	
 	/**
@@ -52,6 +66,7 @@ public class Node
 		_parent = parent;
 		_num_expanded = 0;
 		_distribution = 0;
+		_lock = new ReentrantLock();
 	}
 	
 	/**
@@ -86,6 +101,14 @@ public class Node
 	 */
 	public void expanded(){
 		_num_expanded++;
+	}
+	
+	public void resetNodeExpansions(){
+		_num_expanded=0;
+	}
+	
+	public int getNumExpanded(){
+		return _num_expanded;
 	}
 	
 	/**

@@ -7,18 +7,18 @@ import java.util.*;
 public class testBoard{
 
 	static boolean COLLECT_DATA = true;
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException{
 		
 		BufferedWriter output = COLLECT_DATA ? getBufferedWriter("SequentialRBFM.txt") : null;
 		
-		Board b = new Board(5,'2');
+		Board b = new Board(9,'2');
 
 		Scanner s = new Scanner(System.in);
 
 		char turn = '2';
 		int pos = 0;
 		AIPlayer aiPlayer = new AIPlayer();
-		
+		int count=0;
 		while(true){
 			
 			b.print_board();
@@ -37,19 +37,21 @@ public class testBoard{
 				}
 			}
 			else{
+				count++;
 				// AI's turn
 				try {
 					long startTime = System.currentTimeMillis();
-					pos = aiPlayer.move(b);
+					pos = aiPlayer.move(b,output);
 					while(!b.is_legal(turn, pos)){
-						System.out.println("Illegal Move");
-						pos = aiPlayer.move(b);
+						//System.out.println("Illegal Move at " + pos );
+						pos = aiPlayer.move(b, output);
 					}
 					long elapsedTime = System.currentTimeMillis() - startTime;
 					System.out.println(pos);
 					if (COLLECT_DATA){
 						try {
-							output.write(Long.toString(elapsedTime));
+							output.write("Time elapsed for move " + count + ": " +Long.toString(elapsedTime));
+							output.newLine();
 							output.newLine();
 						} catch (IOException e) {
 							// TODO Auto-generated catch block

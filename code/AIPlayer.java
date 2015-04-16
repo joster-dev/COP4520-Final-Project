@@ -1,3 +1,5 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -9,9 +11,10 @@ import java.util.Random;
 public class AIPlayer{
 	private Node _root;
 	private int _depth;
+	private BufferedWriter _file;
 	private int INF = Integer.MAX_VALUE;
 	public AIPlayer(){
-		_depth = 6;
+		_depth = 3;
 	}
 	
 	/**
@@ -20,20 +23,28 @@ public class AIPlayer{
 	 * @return
 	 * @throws CloneNotSupportedException 
 	 */
-	public int move(Board board) throws CloneNotSupportedException
+	public int move(Board board, BufferedWriter outputFile) throws CloneNotSupportedException, IOException
 	{
 		_root = new Node(null);
 		
 		//  run minimax algorithm
-		int[] pos = minimax(_depth, Board.WHITE, board, _root);
+		minimax(_depth, Board.WHITE, board, _root);
 		
-		int a = minimax(_depth,Board.WHITE,_root,-INF,+INF);
+		minimax(_depth,Board.WHITE,_root,-INF,+INF);
 		
-		System.out.println(pos[0] + " vs " + a);
-		
-		RBFM randomBFM = new RBFM(_root);
-		randomBFM.root_decision();
+		RBFM randomBFM = new RBFM(_root, outputFile);
+		_file = randomBFM.getOutputFile();
+		try {
+			randomBFM.root_decision();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return randomBFM.getRoot().getPosition();
+	}
+	
+	public BufferedWriter getFile(){
+		return _file;
 	}
 	
 	private static ArrayList<Integer> generateMoves(char[] board)

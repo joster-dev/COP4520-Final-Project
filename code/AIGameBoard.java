@@ -41,7 +41,7 @@ public class AIGameBoard{
 		// white player is the AI, and wants to maximize score
 		int difference = Math.abs(newScore - originalScore);
 		if (newScore > originalScore)
-			score = (player == Board.BLACK) ? -difference : difference;
+			score = (player == Board.BLACK) ? (-difference) : difference;
 		return score;
 	}
 
